@@ -3,26 +3,32 @@ using System.Collections.Generic;
 
 public class GravityManager : MonoBehaviour
 {
-    public static GravityManager Instance;
+    public static GravityManager Instance { get; private set; }
 
-    private List<GravityAffectingObject> gravityObjects = new List<GravityAffectingObject>();
+    private List<CelestialBody> gravityObjects = new List<CelestialBody>();
 
     private void Awake()
     {
         // Ensure only one instance of GravityManager exists
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
     }
 
     // Add a gravity object to the list
-    public void Register(GravityAffectingObject obj)
+    public void Register(CelestialBody obj)
     {
         if (!gravityObjects.Contains(obj))
             gravityObjects.Add(obj);
     }
 
     // Remove a gravity object from the list
-    public void Unregister(GravityAffectingObject obj)
+    public void Unregister(CelestialBody obj)
     {
         if (gravityObjects.Contains(obj))
             gravityObjects.Remove(obj);
@@ -42,7 +48,7 @@ public class GravityManager : MonoBehaviour
     }
 
     // **Expose the list of gravity objects**
-    public List<GravityAffectingObject> GetGravityObjects()
+    public List<CelestialBody> GetGravityObjects()
     {
         return gravityObjects;
     }
