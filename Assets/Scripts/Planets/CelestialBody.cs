@@ -6,7 +6,7 @@ public class CelestialBody : MonoBehaviour
 
     [Header("Simulation")]
     [SerializeField, Min(0)]
-    private float radius = 5f;
+    public float radius = 5f;
     public float density = 1f; // Magnitude of gravity
     private float gravityRadius => radius * 50f; // Effective range of gravity
     private float gravityStrength => density * radius * radius;

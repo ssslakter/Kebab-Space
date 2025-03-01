@@ -1,17 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Rocket : MonoBehaviour
 {
     public Vector2 velocity; // Current velocity of the player
+    public float G = 6.67430e-11f; // Gravitational constant
     public float maxSpeed = 200f; // Maximum speed of the player
     public float dumpFactor = 0.5f; // Dumping factor for velocity
     public float engineForce = 10f; // Force applied by the engine
     public float sideEngineForce = 5f; // Force applied by the side engines
 
     private List<Vector2> gravityForces = new List<Vector2>(); // Store forces for visualization
-    private float distanceFromCenterToBottom = 0.5f; // Distance from the center of mass to the bottom of the rocket
-    private float distanceFromCenterToSide = 0.5f; // Distance from the center of mass to the side of the rocket
 
 
     void FixedUpdate()
@@ -30,47 +30,26 @@ public class Rocket : MonoBehaviour
         var rigidbody = GetComponent<Rigidbody2D>();
         rigidbody.AddForce(combinedGravity);
 
-        RunEngine();
+        // RunEngine();
         rigidbody.linearVelocity = Vector2.ClampMagnitude(rigidbody.linearVelocity, maxSpeed);
     }
 
-    void RunEngine()
+    void Start()
     {
         var rigidbody = GetComponent<Rigidbody2D>();
-        var engineForceVector = Vector3.zero;
-        float torque = 0f;
-        if (Input.GetKey(KeyCode.W))
+        var planet = GravityManager.Instance.GetGravityObjects().FirstOrDefault();
+        if (planet != null)
         {
-            engineForceVector += transform.up * engineForce;
-            torque += engineForce * -distanceFromCenterToBottom;
+            // Calculate the initial velocity to escape the planet
+            var planetMass = planet.density * Mathf.PI * planet.radius * planet.radius;
+            var rocketToPlanet = transform.position - planet.transform.position;
+            var escapeSpeed = Mathf.Sqrt(G* planetMass / rocketToPlanet.magnitude);
+            var tangent = -new Vector2(-rocketToPlanet.y, rocketToPlanet.x).normalized;
+            rigidbody.linearVelocity = tangent * escapeSpeed;
         }
-        if (Input.GetKey(KeyCode.A))
-        {
-            engineForceVector += -transform.right * sideEngineForce;
-            torque += sideEngineForce * distanceFromCenterToSide;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            engineForceVector += transform.right * sideEngineForce;
-            torque += -sideEngineForce * distanceFromCenterToSide;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            engineForceVector += -transform.up * engineForce;
-            torque += engineForce * distanceFromCenterToBottom;
-        }
-        rigidbody.AddForce((Vector2)engineForceVector);
-        rigidbody.AddTorque(torque);
+
     }
 
-    float CalculateTorque(Vector3 forceDirection)
-{
-    // Calculate the distance vector from the center of mass to the force application point (relative to the center of the rocket)
-    Vector2 distance = transform.up * (transform.localScale.y / 2f); // Assuming the engine is at the top
-    float torque = Vector2.Perpendicular(distance).magnitude * forceDirection.magnitude;
-
-    return torque;
-}
 
     void OnDrawGizmos()
     {
