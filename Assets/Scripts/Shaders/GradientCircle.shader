@@ -2,7 +2,7 @@ Shader "Unlit/GradientCircle"
 {
     Properties
     {
-        _CenterColor ("Center Color", Color) = (1, 0, 0, 1)
+        _Color ("Center Color", Color) = (1, 0, 0, 1)
         _EdgeColor ("Edge Color", Color) = (0, 0, 1, 1)
         _MainTex ("Base (RGB)", 2D) = "white" { }
         _GradPow ("Gradient Power", Float) = 6.0
@@ -29,7 +29,7 @@ Shader "Unlit/GradientCircle"
                 float2 uv : TEXCOORD0;
             };
 
-            float4 _CenterColor;
+            float4 _Color;
             float4 _EdgeColor;
             float _GradPow;
 
@@ -44,7 +44,7 @@ Shader "Unlit/GradientCircle"
             half4 frag(v2f i) : SV_Target
             {
                 float transition = pow(i.uv.x, _GradPow);
-                return lerp(_CenterColor, _EdgeColor, transition);
+                return lerp(_Color, _EdgeColor, transition);
             }
             ENDCG
         }

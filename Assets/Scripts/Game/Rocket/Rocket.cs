@@ -19,13 +19,7 @@ public class Rocket : MonoBehaviour
         gravityForces.Clear(); // Reset forces for this frame
 
         // Get combined gravity from the GravityManager
-        Vector2 combinedGravity = Vector2.zero;
-        foreach (var obj in GravityManager.Instance.GetGravityObjects())
-        {
-            Vector2 gravity = obj.CalculateGravityAtPoint(transform.position);
-            gravityForces.Add(gravity); // Store individual gravity forces
-            combinedGravity += gravity;
-        }
+        Vector2 combinedGravity = NBodySimulation.CalculateAcceleration(transform.position);
 
         var rigidbody = GetComponent<Rigidbody2D>();
         rigidbody.AddForce(combinedGravity);
@@ -37,19 +31,17 @@ public class Rocket : MonoBehaviour
     void Start()
     {
         var rigidbody = GetComponent<Rigidbody2D>();
-        var planet = GravityManager.Instance.GetGravityObjects().FirstOrDefault();
+        var planet = NBodySimulation.Bodies.FirstOrDefault();
         if (planet != null)
         {
             // Calculate the initial velocity to escape the planet
-            var planetMass = planet.density * Mathf.PI * planet.radius * planet.radius;
             var rocketToPlanet = transform.position - planet.transform.position;
-            var escapeSpeed = Mathf.Sqrt(G* planetMass / rocketToPlanet.magnitude);
+            var escapeSpeed = Mathf.Sqrt(G* planet.mass / rocketToPlanet.magnitude);
             var tangent = -new Vector2(-rocketToPlanet.y, rocketToPlanet.x).normalized;
             rigidbody.linearVelocity = tangent * escapeSpeed;
         }
 
     }
-
 
     void OnDrawGizmos()
     {

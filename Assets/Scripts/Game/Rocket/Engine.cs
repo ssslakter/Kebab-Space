@@ -50,10 +50,6 @@ public class Engine : MonoBehaviour
 
     void DeactivateEngine()
     {
-        if (EngineSettingsManager.Instance.engineParticleSystem.isPlaying)
-        {
-            EngineSettingsManager.Instance.engineParticleSystem.Stop();
-        }
         isEngineActive = false;
     }
 
