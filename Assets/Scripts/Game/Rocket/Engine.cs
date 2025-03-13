@@ -5,6 +5,7 @@ public class Engine : MonoBehaviour
     private Rigidbody2D parentRb;
     public KeyCode launchKey = KeyCode.Space;
     private bool isEngineActive = false;
+    public float engineForce = 10f;
 
     void Start()
     {
@@ -13,11 +14,6 @@ public class Engine : MonoBehaviour
         if (parentRb == null)
         {
             Debug.LogError("Parent Rigidbody2D not found!");
-        }
-
-        if (EngineSettingsManager.Instance.engineParticleSystem == null)
-        {
-            Debug.LogError("Engine particles not assigned in EngineSettingsManager!");
         }
     }
 
@@ -35,15 +31,11 @@ public class Engine : MonoBehaviour
 
     void ActivateEngine()
     {
-        if (!EngineSettingsManager.Instance.engineParticleSystem.isPlaying)
-        {
-            EngineSettingsManager.Instance.engineParticleSystem.Play();
-        }
         if (parentRb != null)
         {
             // Convert local position to world position
             Vector2 worldPosition = transform.position;
-            parentRb.AddForceAtPosition(transform.up * EngineSettingsManager.Instance.engineForce, worldPosition);
+            parentRb.AddForceAtPosition(transform.up * engineForce, worldPosition);
             isEngineActive = true;
         }
     }
@@ -59,7 +51,7 @@ public class Engine : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Vector2 start = transform.position;
-            Vector2 end = start + (Vector2)transform.up * EngineSettingsManager.Instance.engineForce * 0.1f; // Scale the arrow for better visualization
+            Vector2 end = start + (Vector2)transform.up * engineForce * 0.1f; // Scale the arrow for better visualization
             Gizmos.DrawLine(start, end);
 
             // Draw arrowhead
